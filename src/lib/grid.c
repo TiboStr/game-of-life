@@ -1,25 +1,10 @@
+#include "grid.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
 
-
-typedef struct {
-    // 8-bits:
-    //     most significant bit, means alive, middle 4 bits are to store number of neighbours, 3 leas significant bits are unused
-    //     000 0000 1 means alive with no neighbours
-    //     000 1000 1 means alive with 8 neighbours
-    unsigned char state;
-} Cell;
-
-typedef struct {
-    int width;
-    int height;
-
-    Cell *cells;
-} Grid;
-
-void set_cell(Grid *grid, int x, int y, int alive);//TODO
 
 Grid *init_grid(int width, int height) {
     Grid *grid = malloc(sizeof(Grid));
