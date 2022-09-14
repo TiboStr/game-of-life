@@ -4,8 +4,8 @@
 #include <argp.h> /* https://www.linuxtopia.org/online_books/programming_books/gnu_c_programming_tutorial/argp-example.html */
 #include <stdlib.h>
 
-const int DEFAULT_WIDTH = 40;
-const int DEFAULT_HEIGHT = 20;
+const int DEFAULT_WIDTH = 20;
+const int DEFAULT_HEIGHT = 10;
 
 typedef enum {
     random_state, drawing_state, coordinates_state
@@ -80,8 +80,12 @@ int main(int argc, char **argv) {
             arguments.infile, arguments.program_state, arguments.width, arguments.height
     );
 
-    if (0) {
-        Grid *grid = init_grid(10, 10);
+
+        Grid *grid = init_grid(arguments.width, arguments.height);
+
+        if (arguments.program_state == random_state) {
+            generate_random_grid(grid);
+        }
 
         printf("start\n");
 
@@ -107,6 +111,6 @@ int main(int argc, char **argv) {
         destroy_grid(grid);
 
         printf("done\n");
-    }
+
 
 }

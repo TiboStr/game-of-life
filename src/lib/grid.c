@@ -14,11 +14,11 @@ Grid *init_grid(int width, int height) {
     grid->cells = (Cell *) calloc(width * height, sizeof(Cell));
 
     // TODO:
-    set_cell(grid, 4, 2, 1);
-    set_cell(grid, 4, 3, 1);
-    set_cell(grid, 4, 4, 1);
-    set_cell(grid, 3, 4, 1);
-    set_cell(grid, 2, 4, 1);
+  //  set_cell(grid, 4, 2, 1);
+  //  set_cell(grid, 4, 3, 1);
+  //  set_cell(grid, 4, 4, 1);
+  //  set_cell(grid, 3, 4, 1);
+  //  set_cell(grid, 2, 4, 1);
 
 
 
@@ -100,6 +100,18 @@ void set_cell(Grid *grid, int x, int y, int alive) {
 
 }
 
+void generate_random_grid(Grid *grid) {
+
+    for (int x = 0 ; x < grid->width; x++) {
+        for (int y = 0; y < grid->height; y++) {
+            if (((float)rand()/(float)(RAND_MAX)) > 0.70) {
+                set_cell(grid, x, y, 1);
+            }
+        }
+    }
+}
+
+
 void next_generation(Grid *grid) {
 
      Cell *buffer = (Cell *) calloc(grid->width * grid->height, sizeof(Cell));
@@ -158,9 +170,9 @@ void print_grid(Grid *grid) {
             //  printf("%d\n", grid->cells[y*grid->width+x].state);
 
             if ((grid->cells[y * grid->width + x].state & 0x01) == 1) {
-                printf("O");
+                printf("█");
             } else {
-                printf(".");
+                printf(" ");
             }
         }
         printf("\n");
