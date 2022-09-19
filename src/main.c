@@ -85,7 +85,16 @@ int main(int argc, char **argv) {
 
         if (arguments.program_state == random_state) {
             generate_random_grid(grid);
+        } else {
+            void (*functions[2]) (Grid *grid, char* file);
+            functions[0] = generate_grid_from_drawing;
+            functions[1] = generate_grid_from_coordinates;
+
+            (*functions[arguments.program_state-1])(grid, arguments.infile);
         }
+
+
+
 
         printf("start\n");
 

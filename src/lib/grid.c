@@ -13,15 +13,6 @@ Grid *init_grid(int width, int height) {
     grid->height = height;
     grid->cells = (Cell *) calloc(width * height, sizeof(Cell));
 
-    // TODO:
-  //  set_cell(grid, 4, 2, 1);
-  //  set_cell(grid, 4, 3, 1);
-  //  set_cell(grid, 4, 4, 1);
-  //  set_cell(grid, 3, 4, 1);
-  //  set_cell(grid, 2, 4, 1);
-
-
-
     return grid;
 }
 
@@ -102,25 +93,81 @@ void set_cell(Grid *grid, int x, int y, int alive) {
 
 void generate_random_grid(Grid *grid) {
 
-    for (int x = 0 ; x < grid->width; x++) {
+    for (int x = 0; x < grid->width; x++) {
         for (int y = 0; y < grid->height; y++) {
-            if (((float)rand()/(float)(RAND_MAX)) > 0.70) {
+            if (((float) rand() / (float) (RAND_MAX)) > 0.70) {
                 set_cell(grid, x, y, 1);
             }
         }
     }
 }
 
+void generate_grid_from_coordinates(Grid *grid, char *file) {
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen(file, "r");
+    if (fp == NULL) {
+        printf("Could not read file %s\n", file);
+        exit(EXIT_FAILURE);
+    }
+
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        // Strip newline
+        while (line[read - 1] == '\r' || line[read - 1] == '\n') {
+            line[--read] = 0;
+        }
+
+        // Blank line
+        if (!read) {
+            continue;
+        }
+
+        int x;
+        int y;
+
+        int res = sscanf(line, "%d %d", &x, &y);
+
+        if (res != 2 /*on success, sscanf returns number of input items*/) {
+            printf("Error while parsing file '%s', make sure your coordinates are integers values seperated by one space",
+                   file);
+            exit(EXIT_FAILURE);
+        }
+
+        if (x < 0 || x >= grid->width || y < 0 || y >= grid->height) {
+            printf("Error while parsing file '%s'. Make sure your coordinates are valid integer values.\n", file);
+            printf("The x value cannot be smaller than 0 or bigger than the width (=%d).\n", grid->width);
+            printf("The y value cannot be smaller than 0 or bigger than the height (=%d).\n", grid->height);
+            exit(EXIT_FAILURE);
+        }
+
+        set_cell(grid, x, y, 1);
+
+    }
+
+    fclose(fp);
+    if (line)
+        free(line);
+
+}
+
+void generate_grid_from_drawing(Grid *grid, char *file) {
+
+}
+
 
 void next_generation(Grid *grid) {
 
-     Cell *buffer = (Cell *) calloc(grid->width * grid->height, sizeof(Cell));
-     memcpy(buffer, grid->cells, grid->width * grid->height);
+    Cell *buffer = (Cell *) calloc(grid->width * grid->height, sizeof(Cell));
+    memcpy(buffer, grid->cells, grid->width * grid->height);
 
-     Grid* grid_copy;
-     grid_copy->width = grid->width;
-     grid_copy->height = grid->height;
-     grid_copy->cells = buffer;
+    Grid *grid_copy;
+    grid_copy->width = grid->width;
+    grid_copy->height = grid->height;
+    grid_copy->cells = buffer;
 
 
     for (int cell_index = 0; cell_index < grid->width * grid->height; cell_index++) {
@@ -136,7 +183,7 @@ void next_generation(Grid *grid) {
 
         assert(y * grid->width + x == cell_index /*x and y are wrongly calculated*/);
 
-       // unsigned char s = grid->cells[cell_index].state;
+        // unsigned char s = grid->cells[cell_index].state;
 
         if (grid->cells[cell_index].state & 0x01) {
             // Cell is alive, only survives if cell has two or three neighbours
@@ -149,7 +196,7 @@ void next_generation(Grid *grid) {
             // Cell is not alive, becomes alive if it has 3 neighbours
             if (number_of_neighbours == 3) {
                 set_cell(grid_copy, x, y, 1);
-              //  printf("make alive: %d %d\n", x, y);
+                //  printf("make alive: %d %d\n", x, y);
 
             }
 
@@ -158,7 +205,7 @@ void next_generation(Grid *grid) {
     }
 
     memcpy(grid->cells, buffer, grid->width * grid->height);
-   free(buffer);
+    free(buffer);
 
 }
 

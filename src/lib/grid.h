@@ -26,9 +26,9 @@ void set_cell(Grid *grid, int x, int y, int alive);
 
 void generate_random_grid(Grid *grid);
 
-void generate_grid_from_coordinates(Grid *grid);
+void generate_grid_from_coordinates(Grid *grid, char* file);
 
-void generate_grid_from_drawing(Grid *grid);
+void generate_grid_from_drawing(Grid *grid, char* file);
 
 void next_generation(Grid *grid);
 
