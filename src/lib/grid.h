@@ -26,13 +26,15 @@ void set_cell(Grid *grid, int x, int y, int alive);
 
 void generate_random_grid(Grid *grid);
 
-void generate_grid_from_coordinates(Grid *grid, char* file);
+void generate_grid_from_coordinates(Grid *grid, char *file);
 
-void generate_grid_from_drawing(Grid *grid, char* file);
+void generate_grid_from_drawing(Grid *grid, char *file);
 
 void next_generation(Grid *grid);
 
 void print_grid(Grid *grid);
+
+void simulate_grid(Grid *grid, int iterations);
 
 
 #endif //GAME_OF_LIFE_GRID_H

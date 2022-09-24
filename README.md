@@ -1,12 +1,12 @@
 # Game of Life
 
-This is a c implementation of Conway's Game of Life.
+This is a C implementation of Conway's Game of Life.
 
 You can use e.g. CMake to build an executable.
 
 ## Usage
 
-```bash
+```shell
 $ game_of_life --help
 Usage: game_of_life [OPTION...] 
 game_of_life -- An implementation of Conway's Game of Life
@@ -16,7 +16,8 @@ game_of_life -- An implementation of Conway's Game of Life
   -c, --coordinates=FILE     Read file where coordinates are listed
   -d, --drawing=FILE         Read file where a starting pattern is drawn
   -h, --height=HEIGHT        The height of the visualization
-  -w, --width=WIDTH          The width of the visualization
+  -w, --width=WIDTH          The width of the visualization, default value
+  -i, --iterations=ITERATIONS   Number of generations that will be displayed
   -?, --help                 Give this help list
       --usage                Give a short usage message
 

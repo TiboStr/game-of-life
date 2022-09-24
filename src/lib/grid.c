@@ -5,6 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
+
+/* For the sleep function */
+#ifdef _WIN32
+
+#include <Windows.h>
+
+#else
+
+#include <unistd.h>
+
+#endif
 
 
 Grid *init_grid(int width, int height) {
@@ -30,11 +42,6 @@ void set_cell(Grid *grid, int x, int y, int alive) {
 
     assert(index < grid->width * grid->height /*Wrong x and y values*/);
     assert(alive == 1 || alive == 0 /*Wrong value for parameter 'alive' (should be 1 or 0)*/);
-
-    //printf("x y: %d %d\n", x, y);
-
-    //printf("%d\n", grid->cells[index].state & 0x01);
-
 
     assert(
             (
@@ -159,7 +166,8 @@ void generate_grid_from_drawing(Grid *grid, char *file) {
     unsigned int number_of_lines = count_lines(fp);
 
     if (number_of_lines > grid->height) {
-        printf("You specified the height of the grid as %d, but your file contains %d lines.", grid->height, number_of_lines);
+        printf("You specified the height of the grid as %d, but your file contains %d lines.", grid->height,
+               number_of_lines);
         exit(EXIT_FAILURE);
     }
 
@@ -168,7 +176,8 @@ void generate_grid_from_drawing(Grid *grid, char *file) {
     free(longest_line_ptr);
 
     if (number_of_lines > grid->width) {
-        printf("You specified the width of the grid as %d, but the longest line in your file contains %d characters.", grid->width, longest_line);
+        printf("You specified the width of the grid as %d, but the longest line in your file contains %d characters.",
+               grid->width, longest_line);
         exit(EXIT_FAILURE);
     }
 
@@ -211,9 +220,7 @@ void next_generation(Grid *grid) {
     Cell *buffer = (Cell *) calloc(grid->width * grid->height, sizeof(Cell));
     memcpy(buffer, grid->cells, grid->width * grid->height);
 
-    Grid *grid_copy;
-    grid_copy->width = grid->width;
-    grid_copy->height = grid->height;
+    Grid *grid_copy = init_grid(grid->width, grid->height);
     grid_copy->cells = buffer;
 
 
@@ -230,20 +237,16 @@ void next_generation(Grid *grid) {
 
         assert(y * grid->width + x == cell_index /*x and y are wrongly calculated*/);
 
-        // unsigned char s = grid->cells[cell_index].state;
-
         if (grid->cells[cell_index].state & 0x01) {
             // Cell is alive, only survives if cell has two or three neighbours
             if (!(number_of_neighbours == 2 || number_of_neighbours == 3)) {
                 set_cell(grid_copy, x, y, 0);
-                //printf("kill: %d %d\n", x, y);
             }
 
         } else {
             // Cell is not alive, becomes alive if it has 3 neighbours
             if (number_of_neighbours == 3) {
                 set_cell(grid_copy, x, y, 1);
-                //  printf("make alive: %d %d\n", x, y);
 
             }
 
@@ -252,7 +255,7 @@ void next_generation(Grid *grid) {
     }
 
     memcpy(grid->cells, buffer, grid->width * grid->height);
-    free(buffer);
+    destroy_grid(grid_copy);
 
 }
 
@@ -261,8 +264,6 @@ void print_grid(Grid *grid) {
 
     for (int y = 0; y < grid->height; y++) {
         for (int x = 0; x < grid->width; x++) {
-            //  printf("%d\n", grid->cells[y*grid->width+x].state);
-
             if ((grid->cells[y * grid->width + x].state & 0x01) == 1) {
                 printf("█");
             } else {
@@ -271,6 +272,24 @@ void print_grid(Grid *grid) {
         }
         printf("\n");
     }
+}
+
+
+void simulate_grid(Grid *grid, int iterations) {
+
+    int limit = iterations == -1 ? INT_MAX : iterations;
+
+    for (int i = 0; i < limit; i++) {
+        printf("Generation %d:\n\n", i);
+
+        print_grid(grid);
+        next_generation(grid);
+
+        printf("\n######################################\n");
+
+        sleep(2);
+    }
+
 }
 
 
