@@ -1,4 +1,5 @@
 #include "grid.h"
+#include "util/util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,17 +21,6 @@ void destroy_grid(Grid *grid) {
     free(grid->cells);
     free(grid);
 }
-
-/*Grid *deep_copy_grid(Grid *original_grid) {
-    Grid *new_grid = malloc(sizeof(Grid));
-
-    new_grid->width = original_grid->width;
-    new_grid->height = original_grid->height;
-
-    new_grid->cells = (Cell *) calloc(new_grid->width * new_grid->height, sizeof(Cell));
-    memcpy(new_grid->cells, original_grid->cells, new_grid->width * new_grid->height);
-
-}*/
 
 
 void set_cell(Grid *grid, int x, int y, int alive) {
@@ -155,7 +145,64 @@ void generate_grid_from_coordinates(Grid *grid, char *file) {
 }
 
 void generate_grid_from_drawing(Grid *grid, char *file) {
+    FILE *fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
 
+    fp = fopen(file, "r");
+    if (fp == NULL) {
+        printf("Could not read file %s\n", file);
+        exit(EXIT_FAILURE);
+    }
+
+    unsigned int number_of_lines = count_lines(fp);
+
+    if (number_of_lines > grid->height) {
+        printf("You specified the height of the grid as %d, but your file contains %d lines.", grid->height, number_of_lines);
+        exit(EXIT_FAILURE);
+    }
+
+    char *longest_line_ptr = malloc(1);
+    unsigned int longest_line = get_longest_line_in_file(fp, longest_line_ptr);
+    free(longest_line_ptr);
+
+    if (number_of_lines > grid->width) {
+        printf("You specified the width of the grid as %d, but the longest line in your file contains %d characters.", grid->width, longest_line);
+        exit(EXIT_FAILURE);
+    }
+
+
+    int starting_row = grid->height / 2 - number_of_lines / 2;
+    int starting_col = grid->width / 2 - longest_line / 2;
+
+    int row_counter = 0;
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        while (line[read - 1] == '\r' || line[read - 1] == '\n') {
+            line[--read] = 0;
+        }
+
+        if (!read) {
+            continue;
+        }
+
+        int col_counter = 0;
+        for (int i = 0; i < read; i++) {
+
+            if (line[i] == '1') {
+                set_cell(grid, starting_col + col_counter, starting_row + row_counter, 1);
+            }
+
+            col_counter++;
+        }
+
+        row_counter++;
+    }
+
+    fclose(fp);
+    if (line)
+        free(line);
 }
 
 
